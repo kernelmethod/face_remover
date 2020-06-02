@@ -28,6 +28,13 @@ parser.add_argument(
     default=1.5,
 )
 
+parser.add_argument(
+    "--confidence",
+    type=float,
+    help="Minimum confidence needed to determine that a part of the image is a face",
+    default=0.80,
+)
+
 """
 Function definitions
 """
@@ -45,7 +52,7 @@ def expand_box(x1, y1, x2, y2, scale_factor):
     return x1, y1, x2, y2
 
 
-def blackout_faces(filename, box_scale_factor=1):
+def blackout_faces(filename, box_scale_factor=1, min_confidence=0.95):
     img = cv2.cvtColor(cv2.imread(filename), cv2.COLOR_BGR2RGB)
     detector = MTCNN()
     results = detector.detect_faces(img)
@@ -54,8 +61,10 @@ def blackout_faces(filename, box_scale_factor=1):
     # modified image
     orig = img.copy()
 
+    n_thrown_out = 0
     for res in results:
-        if res["confidence"] < 0.95:
+        if res["confidence"] < min_confidence:
+            n_thrown_out += 1
             continue
         box = res["box"]
 
@@ -69,6 +78,7 @@ def blackout_faces(filename, box_scale_factor=1):
 
         img[y1:y2, x1:x2] = 0
 
+    print(f"Found {len(results)} faces (skipped {n_thrown_out})")
     return orig, img
 
 
@@ -85,8 +95,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
     filename = args.image_file
     scale_factor = args.box_scale_factor
+    min_confidence = args.confidence
 
-    orig, img = blackout_faces(filename, box_scale_factor=args.box_scale_factor)
+    orig, img = blackout_faces(
+        filename, box_scale_factor=args.box_scale_factor, min_confidence=min_confidence
+    )
 
     # Save file
     filename, ext = os.path.splitext(filename)
