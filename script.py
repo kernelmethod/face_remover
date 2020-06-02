@@ -18,21 +18,20 @@ parser = argparse.ArgumentParser(
 )
 
 parser.add_argument(
-    "image_file",
-    type=str,
-    help="File that the image should be read from."
+    "image_file", type=str, help="File that the image should be read from."
 )
 
 parser.add_argument(
     "--box_scale_factor",
     type=float,
     help="Scaling factor for boxes placed over faces",
-    default=2.0
+    default=1.5,
 )
 
 """
 Function definitions
 """
+
 
 def expand_box(x1, y1, x2, y2, scale_factor):
     center_x = (x1 + x2) / 2
@@ -51,6 +50,10 @@ def blackout_faces(filename, box_scale_factor=1):
     detector = MTCNN()
     results = detector.detect_faces(img)
 
+    # Make a copy of the original image to return alongside the
+    # modified image
+    orig = img.copy()
+
     for res in results:
         if res["confidence"] < 0.95:
             continue
@@ -64,9 +67,9 @@ def blackout_faces(filename, box_scale_factor=1):
         y1 = max(y1, 0)
         y2 = min(y2, img.shape[0])
 
-        img[y1:y2,x1:x2] = 0
+        img[y1:y2, x1:x2] = 0
 
-    return img
+    return orig, img
 
 
 def save_image(img, outfile):
@@ -83,14 +86,22 @@ if __name__ == "__main__":
     filename = args.image_file
     scale_factor = args.box_scale_factor
 
-    img = blackout_faces(filename, box_scale_factor=args.box_scale_factor)
+    orig, img = blackout_faces(filename, box_scale_factor=args.box_scale_factor)
 
     # Save file
     filename, ext = os.path.splitext(filename)
-    outfile = filename + ".blacked_out" + ext
+    outfile = f"{filename}.blacked_out{ext}"
     save_image(img, outfile)
 
+    print()
+    print(f"Image saved to {outfile}")
+
     # Display image to user
-    fig = plt.figure(figsize=(16,16))
-    plt.imshow(img)
+    fig, axes = plt.subplots(1, 2, figsize=(20, 10))
+    axes[0].imshow(orig)
+    axes[1].imshow(img)
+    for ax in axes:
+        ax.set_xticks([])
+        ax.set_yticks([])
+
     plt.show()

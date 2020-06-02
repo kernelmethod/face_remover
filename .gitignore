@@ -4,3 +4,6 @@
 
 venv
 virtualenv
+
+# Files generated through the script
+*.blacked_out.*
