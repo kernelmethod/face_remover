@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+
+import argparse
+import os
+
+parser = argparse.ArgumentParser(
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+)
+
+parser.add_argument(
+    "image_file", type=str, help="File that the image should be read from."
+)
+
+parser.add_argument(
+    "--box_scale_factor",
+    type=float,
+    help="Scaling factor for boxes placed over faces",
+    default=1.5,
+)
+
+parser.add_argument(
+    "--confidence",
+    type=float,
+    help="Minimum confidence needed to determine that a part of the image is a face",
+    default=0.80,
+)
+
+if __name__ == "__main__":
+    args = parser.parse_args()
+    filename = args.image_file
+    scale_factor = args.box_scale_factor
+    min_confidence = args.confidence
+
+    orig, img = blackout_faces(
+        filename, box_scale_factor=args.box_scale_factor, min_confidence=min_confidence
+    )
+
+    # Save file
+    filename, ext = os.path.splitext(filename)
+    outfile = f"{filename}.blacked_out{ext}"
+    save_image(img, outfile)
+
+    print()
+    print(f"Image saved to {outfile}")
+
+    # Display image to user
+    fig, axes = plt.subplots(1, 2, figsize=(20, 10))
+    axes[0].imshow(orig)
+    axes[1].imshow(img)
+    for ax in axes:
+        ax.set_xticks([])
+        ax.set_yticks([])
+
+    plt.show()
