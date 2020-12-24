@@ -2,6 +2,8 @@
 
 import argparse
 import os
+import matplotlib.pyplot as plt
+from face_remover import blackout_faces, save_image
 
 parser = argparse.ArgumentParser(
     formatter_class=argparse.ArgumentDefaultsHelpFormatter,
