@@ -14,7 +14,7 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "--box_scale_factor",
+    "--box-scale-factor",
     type=float,
     help="Scaling factor for boxes placed over faces",
     default=1.5,

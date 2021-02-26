@@ -2,7 +2,6 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-from mtcnn import MTCNN
 from PIL import Image
 
 def expand_box(x1: int, y1: int, x2: int, y2: int, scale_factor: float):
@@ -21,6 +20,15 @@ def expand_box(x1: int, y1: int, x2: int, y2: int, scale_factor: float):
 
 def blackout_faces(filename: str, box_scale_factor: float = 1, min_confidence: float = 0.95):
     """Find all of the faces in an image and obscure them with black boxes."""
+    # This import automatically launches some code to check for attached GPUs, the
+    # presence of libcuda.so, etc. This can generate a decent amount of output as
+    # well as slow down the script quite a bit.
+    #
+    # For that reason, we delay this import until this function so that if for
+    # whatever reason this function doesn't get called (e.g. if the user just wants
+    # to get usage information) we don't run the checker script.
+    from mtcnn import MTCNN
+
     img = cv2.cvtColor(cv2.imread(filename), cv2.COLOR_BGR2RGB)
     detector = MTCNN()
     results = detector.detect_faces(img)
