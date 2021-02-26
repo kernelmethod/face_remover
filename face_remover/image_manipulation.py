@@ -1,8 +1,7 @@
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
-
 from PIL import Image
+
 
 def expand_box(x1: int, y1: int, x2: int, y2: int, scale_factor: float):
     """Expand a rectangular box by some scaling factor. Used to rescale the
@@ -18,7 +17,9 @@ def expand_box(x1: int, y1: int, x2: int, y2: int, scale_factor: float):
     return x1, y1, x2, y2
 
 
-def blackout_faces(filename: str, box_scale_factor: float = 1, min_confidence: float = 0.95):
+def blackout_faces(
+    filename: str, box_scale_factor: float = 1, min_confidence: float = 0.95
+):
     """Find all of the faces in an image and obscure them with black boxes."""
     # This import automatically launches some code to check for attached GPUs, the
     # presence of libcuda.so, etc. This can generate a decent amount of output as
