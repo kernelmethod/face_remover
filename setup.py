@@ -10,7 +10,7 @@ with open("requirements.txt", "r") as f:
 
 setup(
     name="face_remover",
-    version="0.1.1",
+    version="0.1.2",
     description="Face and EXIF metadata removal utility",
     author="kernelmethod",
     author_email="17100608+kernelmethod@users.noreply.github.com",
